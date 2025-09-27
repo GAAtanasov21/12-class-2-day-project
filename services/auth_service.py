@@ -18,5 +18,5 @@ def verify_user(email, password):
     user = get_user(email)
     if not user:
         return False
-    return check_password_hash(user["password_hash"], password)
+    return check_password_hash(user["password"], password)
 

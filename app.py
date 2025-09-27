@@ -1,6 +1,7 @@
 from flask import Flask, render_template
 from controllers.auth_controller import auth_bp
 app = Flask(__name__)
+app.secret_key = "dev-secret-key"
 app.register_blueprint(auth_bp)
 
 @app.route('/')
