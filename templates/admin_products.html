@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Manage Products</h2>
+<a class="button" href="{{ url_for('admin.add_product_route') }}">Add New Product</a>
+
+<table class="admin-table">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Name</th>
+      <th>Color</th>
+      <th>Sizes</th>
+      <th>Price</th>
+      <th>Stock</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for p in products %}
+    <tr>
+      <td>{{ p.id }}</td>
+      <td>{{ p.name }}</td>
+      <td>{{ p.color }}</td>
+      <td>{{ p.sizes|join(", ") }}</td>
+      <td>${{ '%.2f'|format(p.price) }}</td>
+      <td>{{ p.stock }}</td>
+      <td>
+        <a href="{{ url_for('admin.edit_product', product_id=p.id) }}">Edit</a>
+        <form style="display:inline;" method="post" action="{{ url_for('admin.delete_product', product_id=p.id) }}">
+          <button type="submit" onclick="return confirm('Delete this product?');">Delete</button>
+        </form>
+      </td>
+    </tr>
+    {% else %}
+    <tr><td colspan="7">No products available.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

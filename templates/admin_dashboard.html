@@ -1,14 +1,14 @@
 {% extends "base.html" %}
 
 {% block content %}
-  <h2>Admin Dashboard</h2>
-  <p>Welcome, {{ session.get("user_email") }}!</p>
+<h2>Admin Dashboard</h2>
+<p>Welcome, {{ session.get("user_email") }}!</p>
 
-  <div class="admin-links">
-    <ul>
-      <li><a href="#">Manage Products (CRUD)</a></li>
-      <li><a href="#">View Orders</a></li>
-      <li><a href="#">User Management</a></li>
-    </ul>
-  </div>
+<div class="admin-links">
+  <ul>
+    <li><a href="{{ url_for('admin.manage_product') }}">Manage Products (CRUD)</a></li>
+    <li><a href="#">View Orders</a></li>
+    <li><a href="#">User Management</a></li>
+  </ul>
+</div>
 {% endblock %}

@@ -12,7 +12,6 @@ def catalog():
 
     products = list_products()
 
-    # basic search and filter
     if query:
         products = [p for p in products if query in p.name.lower() or query in p.color.lower()]
     if color_filter:

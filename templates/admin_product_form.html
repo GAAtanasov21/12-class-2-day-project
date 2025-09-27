@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>{{ action }} Product</h2>
+
+<form method="post" class="form-card">
+  <label for="name">Name</label>
+  <input type="text" name="name" id="name" required value="{{ product.name if product else '' }}">
+
+  <label for="description">Description</label>
+  <input type="text" name="description" id="description" value="{{ product.description if product else '' }}">
+
+  <label for="color">Color</label>
+  <input type="text" name="color" id="color" value="{{ product.color if product else '' }}">
+
+  <label for="sizes">Sizes (comma-separated)</label>
+  <input type="text" name="sizes" id="sizes" value="{{ product.sizes|join(', ') if product else '' }}">
+
+  <label for="price">Price</label>
+  <input type="number" name="price" id="price" step="0.01" value="{{ product.price if product else '' }}">
+
+  <label for="stock">Stock</label>
+  <input type="number" name="stock" id="stock" value="{{ product.stock if product else '' }}">
+
+  <button type="submit">{{ action }} Product</button>
+</form>
+
+<a href="{{ url_for('admin.manage_product') }}">Back to Product List</a>
+{% endblock %}
