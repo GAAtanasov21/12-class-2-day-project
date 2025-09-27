@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>ShoeStore</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <h1 class="logo"><a href="{{ url_for('index') }}">ShoeStore</a></h1>
+      <nav class="main-nav">
+        {% if session.get('user_email') %}
+          <span class="nav-user">Hi, {{ session.get('user_email') }}</span>
+          <a class="nav-link" href="{{ url_for('auth.logout') }}">Logout</a>
+        {% else %}
+          <a class="nav-link" href="{{ url_for('auth.login') }}">Login</a>
+          <a class="nav-link" href="{{ url_for('auth.register') }}">Register</a>
+        {% endif %}
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <ul class="flashes">
+          {% for msg in messages %}
+            <li>{{ msg }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <small>&copy; ShoeStore</small>
+    </div>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+  <section class="hero">
+    <h2>Welcome to ShoeStore</h2>
+    <p>Browse our collection and find your perfect pair.</p>
+    <div class="hero-buttons">
+      {% if session.get('user_email') %}
+        <a class="button" href="#">Go to catalog</a>
+        <a class="button ghost" href="{{ url_for('auth.logout') }}">Logout</a>
+      {% else %}
+        <a class="button" href="{{ url_for('auth.login') }}">Login</a>
+        <a class="button ghost" href="{{ url_for('auth.register') }}">Register</a>
+      {% endif %}
+    </div>
+  </section>
+{% endblock %}
