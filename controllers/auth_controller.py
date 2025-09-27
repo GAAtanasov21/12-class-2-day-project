@@ -11,9 +11,9 @@ def login():
         password = request.form.get("password") or ""
         if verify_user(email, password):
             user = get_user(email)
-            session["user_email"] = user["email"]
-            session["is_admin"] = user.get("is_admin", False)
-            flash(f"Logged in as {user['email']}")
+            session["user_email"] = user.email
+            session["is_admin"] = user.is_admin
+            flash(f"Logged in as {user.email}")
             return redirect(url_for("index"))
         else:
             flash("Invalid email or password.")
