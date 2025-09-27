@@ -1,11 +1,13 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 from flask import render_template, redirect, url_for, flash
-from services.auth_service import create_user, get_user, verify_user
+from services.auth_service import create_user, get_user, verify_user, init_sample_data
 
 auth_bp = Blueprint('auth', __name__)
 
+
 @auth_bp.route('/login', methods = ["GET", "POST"])
 def login():
+    init_sample_data()
     if request.method == "POST":
         email = (request.form.get("email") or "").lower().strip()
         password = request.form.get("password") or ""

@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>User Management</h2>
+
+<table class="admin-table">
+  <thead>
+    <tr>
+      <th>Email</th>
+      <th>Admin</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for u in users %}
+    <tr>
+      <td>{{ u.email }}</td>
+      <td>{{ "Yes" if u.is_admin else "No" }}</td>
+      <td>
+        {% if u.email != session.get("user_email") %}
+
+        <form method="post" action="{{ url_for('admin.delete_user', email=u.email) }}" style="display:inline;">
+          <button type="submit" onclick="return confirm('Delete this user?');">Delete</button>
+        </form>
+        {% else %}
+        <em>(You)</em>
+        {% endif %}
+      </td>
+    </tr>
+    {% else %}
+    <tr><td colspan="3">No users found.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<a href="{{ url_for('admin.dashboard') }}">Back to Dashboard</a>
+{% endblock %}

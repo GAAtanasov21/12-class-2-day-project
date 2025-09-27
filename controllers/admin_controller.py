@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, session, redirect, url_for, flash, request
 from services.catalog_service import list_products, add_product, get_product, init_sample_products
-from services.models import Product
+from services.auth_service import users, get_user, create_user
+from services.models import Product, User
 admin_bp = Blueprint("admin", __name__)
 
 @admin_bp.before_request
@@ -66,3 +67,20 @@ def delete_product(product_id):
     else:
         flash("Product not found.")
     return redirect(url_for("admin.manage_product"))
+
+@admin_bp.route("/users")
+def manage_users():
+    all_users = list(users.values())
+    return render_template("admin_users.html", users=all_users)
+
+@admin_bp.route("/users/delete/<email>", methods=["POST"])
+def delete_user(email):
+    user = get_user(email)
+    if not user:
+        flash("User not found.")
+    elif user.email == session.get("user_email"):
+        flash("You cannot delete yourself.")
+    else:
+        users.pop(user.email, None)
+        flash(f"User {user.email} deleted.")
+    return redirect(url_for("admin.manage_users"))

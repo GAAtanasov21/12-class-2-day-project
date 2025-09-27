@@ -21,3 +21,12 @@ def verify_user(email, password):
     if not user:
         return False
     return user.check_password(password)
+
+def init_sample_data():
+    """Create one admin and two users for testing if they don't exist yet."""
+    if "admin@example.com" not in users:
+        create_user("admin@example.com", "adminpass", is_admin=True)
+    if "user1@example.com" not in users:
+        create_user("user1@example.com", "user1pass")
+    if "user2@example.com" not in users:
+        create_user("user2@example.com", "user2pass")
