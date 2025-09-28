@@ -7,11 +7,34 @@ def add_product(name, description, color, sizes, price, stock):
     products.append(p)
     return p
 
-def list_products():
-    return products.copy()
+def list_products(query=None, color=None, min_price=None, max_price=None, size=None, in_stock=False):
+    results = products.copy()
+
+    if query:
+        results = [p for p in results if query.lower() in p.name.lower() or query.lower() in p.color.lower()]
+
+    if color:
+        results = [p for p in results if color.lower() in p.color.lower()]
+
+    if min_price is not None:
+        results = [p for p in results if p.price >= min_price]
+
+    if max_price is not None:
+        results = [p for p in results if p.price <= max_price]
+
+    if size is not None:
+        results = [p for p in results if size in p.sizes]
+
+    if in_stock:
+        results = [p for p in results if p.stock > 0]
+
+    return results
 
 def get_product(pid):
-    return next((p for p in products if p.id == pid), None)
+    for p in products:
+        if p.id == pid:
+            return p
+    return None
 
 def init_sample_products():
     if products:

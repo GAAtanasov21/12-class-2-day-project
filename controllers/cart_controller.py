@@ -23,7 +23,7 @@ def add(product_id):
         return redirect(url_for("auth.login"))
 
     user_email = session["user_email"]
-    size = request.args.get("size")  # grab size from query parameters
+    size = request.args.get("size")
     if not size:
         flash("You must select a size")
         return redirect(url_for("catalog.catalog"))

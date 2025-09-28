@@ -37,7 +37,7 @@ class Order:
         self.id = Order._next_id
         Order._next_id += 1
         self.user_email = user_email
-        self.items = items  # list of dicts { product, size, quantity, subtotal }
+        self.items = items
         self.address = address
         self.payment_method = payment_method
         self.created_at = datetime.now()

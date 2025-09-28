@@ -1,9 +1,6 @@
 from services.catalog_service import get_product
 
-# Store carts per user_email
 carts = {}
-
-# Store orders per user_email
 
 def get_cart(user_email):
     return carts.setdefault(user_email, [])

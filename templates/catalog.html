@@ -10,6 +10,20 @@
   <label for="color">Filter by color</label>
   <input type="text" id="color" name="color" value="{{ color_filter }}">
 
+  <label for="min_price">Min Price</label>
+  <input type="number" id="min_price" name="min_price" step="0.01" value="{{ min_price }}">
+
+  <label for="max_price">Max Price</label>
+  <input type="number" id="max_price" name="max_price" step="0.01" value="{{ max_price }}">
+
+  <label for="size">Size</label>
+  <input type="number" id="size" name="size" value="{{ size }}">
+
+  <label>
+    <input type="checkbox" name="in_stock" {% if in_stock %}checked{% endif %}>
+    In stock only
+  </label>
+
   <button type="submit">Search</button>
 </form>
 
@@ -40,7 +54,6 @@
         {% else %}
           <a class="button" href="{{ url_for('auth.login') }}">Login to Buy</a>
       {% endif %}
-
     </div>
   {% else %}
     <p>No products found.</p>
