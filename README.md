@@ -1,4 +1,4 @@
-<img width="1680" height="917" alt="image" src="https://github.com/user-attachments/assets/1780a736-3c7d-4a7b-a5b4-0e1f0d3be464" /># 12-class-2-day-project
+
 ERD 
 https://lucid.app/lucidchart/d34dc035-a069-4c55-a863-ca85e9f554e2/edit?viewport_loc=-2134%2C-252%2C3454%2C1842%2C0_0&invitationId=inv_c36c45f7-be46-4164-9350-fae7091637e6
 Class diagram
