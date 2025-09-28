@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, session, redirect, url_for, flash, request
 from services.catalog_service import list_products, add_product, get_product
-from services.auth_service import users
-
+from services.auth_service import users, get_user
+from services.order_service import list_orders
 admin_bp = Blueprint("admin", __name__, url_prefix="/admin")
 
 @admin_bp.before_request
@@ -52,3 +52,49 @@ def edit_product(product_id):
         flash(f"Product {product.name} updated")
         return redirect(url_for("admin.manage_product"))
     return render_template("admin_product_form.html", action="Edit", product=product)
+
+@admin_bp.route("/products/delete/<int:product_id>", methods=["POST"])
+def delete_product(product_id):
+    product = get_product(product_id)
+    if product:
+        from services.catalog_service import products
+        products.remove(product)
+        flash(f"Product '{product.name}' deleted.")
+    else:
+        flash("Product not found.")
+    return redirect(url_for("admin.manage_product"))
+@admin_bp.route("/users")
+def manage_users():
+    all_users = list(users.values())  # users is a dict {email -> User}
+    return render_template("admin_users.html", users=all_users)
+
+@admin_bp.route("/users/toggle_admin/<email>", methods=["POST"])
+def toggle_admin(email):
+    user = get_user(email)
+    if not user:
+        flash("User not found.")
+    elif user.email == session.get("user_email"):
+        flash("You cannot change your own admin status.")
+    else:
+        user.is_admin = not user.is_admin
+        flash(f"{'Promoted' if user.is_admin else 'Demoted'} {user.email}.")
+    return redirect(url_for("admin.manage_users"))
+
+@admin_bp.route("/users/delete/<email>", methods=["POST"])
+def delete_user(email):
+    user = get_user(email)
+    if not user:
+        flash("User not found.")
+    elif user.email == session.get("user_email"):
+        flash("You cannot delete yourself.")
+    else:
+        users.pop(user.email, None)
+        flash(f"User {user.email} deleted.")
+    return redirect(url_for("admin.manage_users"))
+@admin_bp.route("/orders")
+def view_orders():
+    all_orders = list_orders()
+    for o in all_orders:
+        print("DEBUG ORDER:", o, type(o))
+    return render_template("admin_orders.html", orders=all_orders)
+

@@ -1,0 +1,153 @@
+/* General resets */
+body, h1, h2, h3, h4, h5, h6, p, ul, li, table, th, td, form, input, textarea, select, button {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+/* Body */
+body {
+  background-color: #f9f9f9;
+  color: #333;
+  line-height: 1.5;
+}
+
+/* Container */
+.container {
+  width: 90%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem 0;
+}
+
+/* Header */
+.site-header {
+  background-color: #222;
+  color: #fff;
+  padding: 1rem 0;
+}
+.site-header .logo a {
+  color: #fff;
+  text-decoration: none;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+.main-nav {
+  margin-top: 0.5rem;
+}
+.main-nav .nav-link, .main-nav .nav-user {
+  margin-right: 1rem;
+  color: #fff;
+  text-decoration: none;
+}
+.main-nav .nav-link:hover {
+  text-decoration: underline;
+}
+
+/* Footer */
+.site-footer {
+  background-color: #222;
+  color: #fff;
+  text-align: center;
+  padding: 1rem 0;
+  margin-top: 2rem;
+}
+
+/* Forms */
+.form-card {
+  background-color: #fff;
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  margin-bottom: 1rem;
+}
+.form-card label {
+  display: block;
+  margin-top: 0.5rem;
+}
+.form-card input, .form-card select, .form-card textarea, .form-card button {
+  width: 100%;
+  padding: 0.5rem;
+  margin-top: 0.25rem;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+.form-card button {
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  margin-top: 1rem;
+  cursor: pointer;
+}
+.form-card button:hover {
+  background-color: #0056b3;
+}
+
+/* Buttons */
+.button {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  text-decoration: none;
+  background-color: #007bff;
+  color: #fff;
+  margin-top: 0.5rem;
+}
+.button:hover {
+  background-color: #0056b3;
+}
+.button.ghost {
+  background-color: transparent;
+  color: #007bff;
+  border: 1px solid #007bff;
+}
+.button.ghost:hover {
+  background-color: #007bff;
+  color: #fff;
+}
+
+/* Tables */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1rem;
+}
+table, th, td {
+  border: 1px solid #ccc;
+}
+th, td {
+  padding: 0.5rem;
+  text-align: left;
+}
+.admin-table th {
+  background-color: #f0f0f0;
+}
+
+/* Product grid */
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+.product-card {
+  background-color: #fff;
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  text-align: center;
+}
+
+/* Flash messages */
+.flashes {
+  list-style: none;
+  margin-bottom: 1rem;
+}
+.flashes li {
+  background-color: #fffae6;
+  border: 1px solid #ffe58f;
+  padding: 0.5rem;
+  border-radius: 4px;
+  margin-bottom: 0.5rem;
+}

@@ -5,7 +5,7 @@ from controllers.cart_controller import cart_bp
 from controllers.admin_controller import admin_bp
 from services.auth_service import init_sample_users
 from services.catalog_service import init_sample_products
-
+from controllers.order_controller import order_bp
 app = Flask(__name__)
 app.secret_key = "supersecret"
 
@@ -18,6 +18,7 @@ app.register_blueprint(auth_bp)
 app.register_blueprint(catalog_bp)
 app.register_blueprint(cart_bp)
 app.register_blueprint(admin_bp)
+app.register_blueprint(order_bp)
 
 @app.route("/")
 def index():

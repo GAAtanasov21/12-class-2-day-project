@@ -24,14 +24,23 @@
       <p><strong>In stock:</strong> {{ p.stock }}</p>
 
       {% if session.get('user_email') %}
-        {% if p.stock > 0 %}
-          <a class="button" href="{{ url_for('cart.add', product_id=p.id) }}">Add to Cart</a>
+          {% if p.stock > 0 %}
+            <form action="{{ url_for('cart.add', product_id=p.id) }}" method="get">
+              <label for="size_{{ p.id }}">Size:</label>
+              <select name="size" id="size_{{ p.id }}" required>
+                {% for s in p.sizes %}
+                  <option value="{{ s }}">{{ s }}</option>
+                {% endfor %}
+              </select>
+              <button type="submit">Add to Cart</button>
+            </form>
+          {% else %}
+            <span style="color:red;">Out of stock</span>
+          {% endif %}
         {% else %}
-          <span style="color:red;">Out of stock</span>
-        {% endif %}
-      {% else %}
-        <a class="button" href="{{ url_for('auth.login') }}">Login to Buy</a>
+          <a class="button" href="{{ url_for('auth.login') }}">Login to Buy</a>
       {% endif %}
+
     </div>
   {% else %}
     <p>No products found.</p>

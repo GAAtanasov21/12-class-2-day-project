@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from werkzeug.security import generate_password_hash, check_password_hash
 
 class User:
@@ -27,3 +29,20 @@ class Product:
             return False
         self.stock -= amount
         return True
+
+class Order:
+    _next_id = 1
+
+    def __init__(self, user_email, items, address, payment_method):
+        self.id = Order._next_id
+        Order._next_id += 1
+        self.user_email = user_email
+        self.items = items  # list of dicts { product, size, quantity, subtotal }
+        self.address = address
+        self.payment_method = payment_method
+        self.created_at = datetime.now()
+        self.total = sum(item["subtotal"] for item in items)
+
+    def __repr__(self):
+        return f"<Order {self.id} by {self.user_email}, total={self.total}>"
+

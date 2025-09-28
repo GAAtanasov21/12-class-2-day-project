@@ -1,25 +1,29 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h2>Checkout</h2>
+  <h2>Checkout</h2>
 
-<form method="post" class="form-card">
-  <label for="address">Address</label>
-  <input type="text" name="address" id="address" required>
+  <h3>Your Cart</h3>
+  <ul>
+    {% for item in cart %}
+      <li>
+        {{ item.product.name }} ({{ item.size }}) - {{ item.quantity }} × ${{ '%.2f'|format(item.product.price) }}
+        = ${{ '%.2f'|format(item.product.price * item.quantity) }}
+      </li>
+    {% endfor %}
+  </ul>
 
-  <label for="payment_method">Payment Method</label>
-  <input type="text" name="payment_method" id="payment_method" required>
+  <form method="post" class="form-card">
+    <label for="address">Delivery Address</label>
+    <textarea id="address" name="address" required></textarea>
 
-  <button type="submit">Place Order</button>
-</form>
+    <label for="payment">Payment Method</label>
+    <select id="payment" name="payment" required>
+      <option value="">--Select--</option>
+      <option value="cash">Cash on Delivery</option>
+      <option value="card">Credit/Debit Card</option>
+    </select>
 
-<h3>Order Summary</h3>
-{% if cart %}
-<ul>
-  {% for item in cart %}
-  <li>{{ item.product.name }} x {{ item.quantity }} - ${{ '%.2f'|format(item.product.price * item.quantity) }}</li>
-  {% endfor %}
-</ul>
-<p>Total: ${{ '%.2f'|format(total) }}</p>
-{% endif %}
+    <button type="submit">Place Order</button>
+  </form>
 {% endblock %}
