@@ -11,6 +11,7 @@ def catalog():
     max_price = request.args.get("max_price")
     size = request.args.get("size")
     in_stock = request.args.get("in_stock") == "on"
+    category = request.args.get("category")
 
     min_price = float(min_price) if min_price else None
     max_price = float(max_price) if max_price else None
@@ -23,7 +24,17 @@ def catalog():
         max_price=max_price,
         size=size,
         in_stock=in_stock,
+        category=category,
     )
+
+    # Category display names
+    category_names = {
+        'running': 'Running Shoes',
+        'everyday': 'Everyday Shoes',
+        'official': 'Official Shoes',
+        'mountain': 'Mountain Shoes'
+    }
+    category_display = category_names.get(category, "All Products")
 
     return render_template(
         "catalog.html",
@@ -34,4 +45,10 @@ def catalog():
         max_price=max_price or "",
         size=size or "",
         in_stock=in_stock,
+        category=category,
+        category_display=category_display,
     )
+
+@catalog_bp.route("/categories")
+def categories():
+    return render_template("categories.html")

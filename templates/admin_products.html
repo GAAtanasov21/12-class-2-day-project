@@ -9,6 +9,7 @@
     <tr>
       <th>ID</th>
       <th>Name</th>
+      <th>Category</th>
       <th>Color</th>
       <th>Sizes</th>
       <th>Price</th>
@@ -17,23 +18,36 @@
     </tr>
   </thead>
   <tbody>
-    {% for p in products %}
+    {% for item in products_with_category %}
     <tr>
-      <td>{{ p.id }}</td>
-      <td>{{ p.name }}</td>
-      <td>{{ p.color }}</td>
-      <td>{{ p.sizes|join(", ") }}</td>
-      <td>${{ '%.2f'|format(p.price) }}</td>
-      <td>{{ p.stock }}</td>
+      <td>{{ item.product.id }}</td>
+      <td>{{ item.product.name }}</td>
       <td>
-        <a href="{{ url_for('admin.edit_product', product_id=p.id) }}">Edit</a>
-        <form style="display:inline;" method="post" action="{{ url_for('admin.delete_product', product_id=p.id) }}">
+        {% if item.category == 'running' %}
+          🏃 Running
+        {% elif item.category == 'everyday' %}
+          👟 Everyday
+        {% elif item.category == 'official' %}
+          👞 Official
+        {% elif item.category == 'mountain' %}
+          🥾 Mountain
+        {% else %}
+          General
+        {% endif %}
+      </td>
+      <td>{{ item.product.color }}</td>
+      <td>{{ item.product.sizes|join(", ") }}</td>
+      <td>${{ '%.2f'|format(item.product.price) }}</td>
+      <td>{{ item.product.stock }}</td>
+      <td>
+        <a href="{{ url_for('admin.edit_product', product_id=item.product.id) }}">Edit</a>
+        <form style="display:inline;" method="post" action="{{ url_for('admin.delete_product', product_id=item.product.id) }}">
           <button type="submit" onclick="return confirm('Delete this product?');">Delete</button>
         </form>
       </td>
     </tr>
     {% else %}
-    <tr><td colspan="7">No products available.</td></tr>
+    <tr><td colspan="8">No products available.</td></tr>
     {% endfor %}
   </tbody>
 </table>

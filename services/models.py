@@ -38,7 +38,7 @@ class EverydayShoe(Product):
     def __init__(self, name, description, color, sizes, price, stock):
         Product.__init__(self, name, description, color, sizes, price, stock)
 
-class OficialShoe(Product):
+class OfficialShoe(Product):
     def __init__(self, name, description, color, sizes, price, stock):
         Product.__init__(self, name, description, color, sizes, price, stock)
 
@@ -63,4 +63,3 @@ class Order:
 
     def __repr__(self):
         return f"<Order {self.id} by {self.user_email}, total={self.total}>"
-

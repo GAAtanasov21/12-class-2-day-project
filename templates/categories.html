@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="hero">
+  <h2>Choose Your Shoe Category</h2>
+  <p>Select from our specialized collections</p>
+</section>
+
+<div class="categories-grid">
+  <div class="category-card">
+    <div class="category-icon">🏃</div>
+    <h3>Running Shoes</h3>
+    <p>Lightweight and designed for speed and comfort during your runs</p>
+    <a href="{{ url_for('catalog.catalog', category='running') }}" class="button">Browse Running Shoes</a>
+  </div>
+
+  <div class="category-card">
+    <div class="category-icon">👟</div>
+    <h3>Everyday Shoes</h3>
+    <p>Casual and comfortable sneakers for daily wear</p>
+    <a href="{{ url_for('catalog.catalog', category='everyday') }}" class="button">Browse Everyday Shoes</a>
+  </div>
+
+  <div class="category-card">
+    <div class="category-icon">👞</div>
+    <h3>Official Shoes</h3>
+    <p>Elegant and professional footwear for formal occasions</p>
+    <a href="{{ url_for('catalog.catalog', category='official') }}" class="button">Browse Official Shoes</a>
+  </div>
+
+  <div class="category-card">
+    <div class="category-icon">🥾</div>
+    <h3>Mountain Shoes</h3>
+    <p>Durable boots built for hiking and outdoor adventures</p>
+    <a href="{{ url_for('catalog.catalog', category='mountain') }}" class="button">Browse Mountain Shoes</a>
+  </div>
+</div>
+
+<div style="text-align: center; margin-top: 2rem;">
+  <a href="{{ url_for('catalog.catalog') }}" class="button ghost">View All Products</a>
+</div>
+{% endblock %}

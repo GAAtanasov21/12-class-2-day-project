@@ -5,7 +5,7 @@
     <p>Browse our collection and find your perfect pair.</p>
     <div class="hero-buttons">
       {% if session.get('user_email') %}
-        <a class="button" href="{{ url_for('catalog.catalog') }}">Go to Catalog</a>
+        <a class="button" href="{{ url_for('catalog.categories') }}">Browse Categories</a>
         <a class="button" href="{{ url_for('cart.view_cart') }}">View Cart</a>
         <a class="button ghost" href="{{ url_for('auth.logout') }}">Logout</a>
       {% else %}

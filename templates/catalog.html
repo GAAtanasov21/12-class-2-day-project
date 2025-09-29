@@ -1,9 +1,17 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h2>Product Catalog</h2>
+<div style="margin-bottom: 1rem;">
+  <a href="{{ url_for('catalog.categories') }}" class="button ghost">← Back to Categories</a>
+</div>
+
+<h2>{{ category_display }}</h2>
 
 <form method="get" class="form-card" style="margin-bottom: 1rem;">
+  {% if category %}
+  <input type="hidden" name="category" value="{{ category }}">
+  {% endif %}
+
   <label for="q">Search by name or color</label>
   <input type="text" id="q" name="q" value="{{ query }}">
 

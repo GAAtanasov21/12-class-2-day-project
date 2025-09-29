@@ -22,6 +22,35 @@
   <label for="stock">Stock</label>
   <input type="number" name="stock" id="stock" value="{{ product.stock if product else '' }}">
 
+  {% if action == 'Add' %}
+  <label for="category">Category</label>
+  <select name="category" id="category" required>
+    <option value="">-- Select Category --</option>
+    <option value="running">🏃 Running Shoes</option>
+    <option value="everyday">👟 Everyday Shoes</option>
+    <option value="official">👞 Official Shoes</option>
+    <option value="mountain">🥾 Mountain Shoes</option>
+  </select>
+  {% else %}
+  <div class="form-info">
+    <label>Category</label>
+    <p>
+      {% if category == 'running' %}
+        🏃 Running Shoes
+      {% elif category == 'everyday' %}
+        👟 Everyday Shoes
+      {% elif category == 'official' %}
+        👞 Official Shoes
+      {% elif category == 'mountain' %}
+        🥾 Mountain Shoes
+      {% else %}
+        General
+      {% endif %}
+      <em>(Category cannot be changed after creation)</em>
+    </p>
+  </div>
+  {% endif %}
+
   <button type="submit">{{ action }} Product</button>
 </form>
 
