@@ -30,6 +30,19 @@ class Product:
         self.stock -= amount
         return True
 
+class RunningShoe(Product):
+    def __init__(self, name, description, color, sizes, price, stock):
+        Product.__init__(self, name, description, color, sizes, price, stock)
+
+class EverydayShoe(Product):
+    def __init__(self, name, description, color, sizes, price, stock):
+        Product.__init__(self, name, description, color, sizes, price, stock)
+
+class OficialShoe(Product):
+    def __init__(self, name, description, color, sizes, price, stock):
+        Product.__init__(self, name, description, color, sizes, price, stock)
+
+
 class Order:
     _next_id = 1
 
