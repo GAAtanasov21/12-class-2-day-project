@@ -6,12 +6,17 @@ body, h1, h2, h3, h4, h5, h6, p, ul, li, table, th, td, form, input, textarea, s
   font-family: Arial, sans-serif;
 }
 
-/* Body */
-body {
-  background-color: #f9f9f9;
-  color: #333;
-  line-height: 1.5;
+/* Ensure footer sticks to bottom */
+html, body {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
+
+main.container {
+  flex: 1;
+}
+
 
 /* Container */
 .container {
