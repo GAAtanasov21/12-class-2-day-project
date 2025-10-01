@@ -7,6 +7,7 @@
       {% if session.get('user_email') %}
         <a class="button" href="{{ url_for('catalog.categories') }}">Browse Categories</a>
         <a class="button" href="{{ url_for('cart.view_cart') }}">View Cart</a>
+          <a class="button" href="{{ url_for('cart.out_of_stock') }}">Test</a>
         <a class="button ghost" href="{{ url_for('auth.logout') }}">Logout</a>
       {% else %}
         <a class="button" href="{{ url_for('auth.login') }}">Login</a>

@@ -27,6 +27,7 @@ def checkout():
             order = create_order(session["user_email"], cart, address, payment)
             clear_cart(session["user_email"])
             flash(f"Order #{order.id} placed successfully!")
+
             return redirect(url_for("index"))
         except ValueError as e:
             flash(str(e))

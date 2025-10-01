@@ -43,3 +43,6 @@ def remove(product_id):
     flash("Item removed from cart")
     return redirect(url_for("cart.view_cart"))
 
+@cart_bp.route("/out_of_stock")
+def out_of_stock():
+    return render_template("out_of_stock.html")
