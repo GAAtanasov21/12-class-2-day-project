@@ -23,8 +23,10 @@ def dashboard():
 
 @admin_bp.route("/products")
 def manage_product():
-    products = list_products()
-    # Add category info to each product for display
+    sort_by = request.args.get("sort_by")
+
+    products = list_products(sort_by=sort_by)
+
     products_with_category = []
     for p in products:
         category = get_product_category(p)
@@ -120,6 +122,4 @@ def delete_user(email):
 @admin_bp.route("/orders")
 def view_orders():
     all_orders = list_orders()
-    for o in all_orders:
-        print("DEBUG ORDER:", o, type(o))
     return render_template("admin_orders.html", orders=all_orders)

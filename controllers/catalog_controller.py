@@ -12,6 +12,7 @@ def catalog():
     size = request.args.get("size")
     in_stock = request.args.get("in_stock") == "on"
     category = request.args.get("category")
+    sort_by = request.args.get("sort_by")
 
     min_price = float(min_price) if min_price else None
     max_price = float(max_price) if max_price else None
@@ -25,6 +26,7 @@ def catalog():
         size=size,
         in_stock=in_stock,
         category=category,
+        sort_by=sort_by,
     )
 
     # Category display names
@@ -47,6 +49,7 @@ def catalog():
         in_stock=in_stock,
         category=category,
         category_display=category_display,
+        sort_by=sort_by or "",
     )
 
 @catalog_bp.route("/categories")
