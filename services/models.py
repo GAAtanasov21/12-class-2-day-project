@@ -1,69 +1,50 @@
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
-from abc import ABC, abstractmethod
+from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import Column, Integer, String, Float, Boolean, DateTime, Text, PickleType
 
-class User:
-    _next_id = 1
+db = SQLAlchemy()
+
+
+class User(db.Model):
+    __tablename__ = 'users'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    email = Column(String(120), unique=True, nullable=False, index=True)
+    password_hash = Column(String(255), nullable=False)
+    is_admin = Column(Boolean, default=False, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    orders = db.relationship('Order', backref='user', lazy=True)
 
     def __init__(self, email, password, is_admin=False):
-        self.__id = User._next_id
-        User._next_id += 1
-        self.__email = email.lower().strip()
-        self.__password_hash = generate_password_hash(password)
-        self.__is_admin = is_admin
-
-    @property
-    def id(self):
-        return self.__id
-
-    @property
-    def email(self):
-        return self.__email
-
-    @property
-    def is_admin(self):
-        return self.__is_admin
-
-    @is_admin.setter
-    def is_admin(self, value):
-        if isinstance(value, bool):
-            self.__is_admin = value
-        else:
-            raise ValueError("is_admin must be a boolean")
+        self.email = email.lower().strip()
+        self.password_hash = generate_password_hash(password)
+        self.is_admin = is_admin
 
     def check_password(self, password):
-        return check_password_hash(self.__password_hash, password)
+        return check_password_hash(self.password_hash, password)
 
     def __repr__(self):
-        return f"<User {self.__email}>"
+        return f"<User {self.email}>"
 
 
-class ProductBase(ABC):
+class Product(db.Model):
+    __tablename__ = 'products'
 
-    @abstractmethod
-    def get_category_display(self):
-        pass
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    name = Column(String(200), nullable=False)
+    description = Column(Text)
+    color = Column(String(50))
+    sizes = Column(PickleType)
+    price = Column(Float, nullable=False)
+    stock = Column(Integer, nullable=False, default=0)
+    product_type = Column(String(50))
+    created_at = Column(DateTime, default=datetime.utcnow)
 
-    @abstractmethod
-    def get_product_type(self):
-        pass
-
-    def calculate_discount(self, discount_percent):
-        """Concrete method available to all products"""
-        return self.price * (1 - discount_percent / 100)
-
-class Product(ProductBase):
-    _next_id = 1
-
-    def __init__(self, name, description, color, sizes, price, stock):
-        self.id = Product._next_id
-        Product._next_id += 1
-        self.name = name
-        self.description = description
-        self.color = color
-        self.sizes = sizes
-        self.price = float(price)
-        self.stock = int(stock)
+    __mapper_args__ = {
+        'polymorphic_identity': 'product',
+        'polymorphic_on': product_type
+    }
 
     def reduce_stock(self, amount):
         if amount > self.stock:
@@ -80,18 +61,17 @@ class Product(ProductBase):
     def get_product_type(self):
         return "general"
 
+    def calculate_discount(self, discount_percent):
+        return self.price * (1 - discount_percent / 100)
+
     def __str__(self):
         return f"{self.name} - ${self.price}"
 
 
 class RunningShoe(Product):
-    """
-    Polymorphism: Overrides parent methods with specific implementation
-    """
-
-    def __init__(self, name, description, color, sizes, price, stock):
-        super().__init__(name, description, color, sizes, price, stock)
-        self.shoe_type = "Running"
+    __mapper_args__ = {
+        'polymorphic_identity': 'running',
+    }
 
     def get_category_display(self):
         return "Running Shoes - Lightweight & Fast"
@@ -104,10 +84,9 @@ class RunningShoe(Product):
 
 
 class EverydayShoe(Product):
-
-    def __init__(self, name, description, color, sizes, price, stock):
-        super().__init__(name, description, color, sizes, price, stock)
-        self.shoe_type = "Everyday"
+    __mapper_args__ = {
+        'polymorphic_identity': 'everyday',
+    }
 
     def get_category_display(self):
         return "Everyday Shoes - Casual & Comfortable"
@@ -120,10 +99,9 @@ class EverydayShoe(Product):
 
 
 class OfficialShoe(Product):
-
-    def __init__(self, name, description, color, sizes, price, stock):
-        super().__init__(name, description, color, sizes, price, stock)
-        self.shoe_type = "Official"
+    __mapper_args__ = {
+        'polymorphic_identity': 'official',
+    }
 
     def get_category_display(self):
         return "Official Shoes - Elegant & Professional"
@@ -136,10 +114,9 @@ class OfficialShoe(Product):
 
 
 class MountainShoe(Product):
-
-    def __init__(self, name, description, color, sizes, price, stock):
-        super().__init__(name, description, color, sizes, price, stock)
-        self.shoe_type = "Mountain"
+    __mapper_args__ = {
+        'polymorphic_identity': 'mountain',
+    }
 
     def get_category_display(self):
         return "Mountain Shoes - Durable & Rugged"
@@ -151,50 +128,52 @@ class MountainShoe(Product):
         return "Extra Durable"
 
 
-class Order:
-    _next_id = 1
+class Order(db.Model):
+    __tablename__ = 'orders'
 
-    def __init__(self, user_email, items, address, payment_method):
-        self.__id = Order._next_id
-        Order._next_id += 1
-        self.__user_email = user_email
-        self.__items = items
-        self.__address = address
-        self.__payment_method = payment_method
-        self.__created_at = datetime.now()
-        self.__total = sum(item["subtotal"] for item in items)
-
-    # Getters (Properties)
-    @property
-    def id(self):
-        return self.__id
-
-    @property
-    def user_email(self):
-        return self.__user_email
-
-    @property
-    def items(self):
-        return self.__items.copy()  # Return copy to prevent external modification
-
-    @property
-    def address(self):
-        return self.__address
-
-    @property
-    def payment_method(self):
-        return self.__payment_method
-
-    @property
-    def created_at(self):
-        return self.__created_at
-
-    @property
-    def total(self):
-        return self.__total
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    user_id = Column(Integer, db.ForeignKey('users.id'), nullable=False)
+    address = Column(Text, nullable=False)
+    payment_method = Column(String(50), nullable=False)
+    total = Column(Float, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    items = db.relationship('OrderItem', backref='order', lazy=True, cascade='all, delete-orphan')
 
     def get_order_summary(self):
-        return f"Order #{self.__id} - ${self.__total:.2f} - {len(self.__items)} items"
+        return f"Order #{self.id} - ${self.total:.2f} - {len(self.items)} items"
 
     def __repr__(self):
-        return f"<Order {self.__id} by {self.__user_email}, total={self.__total}>"
+        return f"<Order {self.id} by User {self.user_id}, total={self.total}>"
+
+
+class OrderItem(db.Model):
+    __tablename__ = 'order_items'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    order_id = Column(Integer, db.ForeignKey('orders.id'), nullable=False)
+    product_id = Column(Integer, db.ForeignKey('products.id'), nullable=False)
+    product_name = Column(String(200), nullable=False)
+    quantity = Column(Integer, nullable=False)
+    size = Column(Integer, nullable=False)
+    price_at_purchase = Column(Float, nullable=False)
+    subtotal = Column(Float, nullable=False)
+    product = db.relationship('Product', backref='order_items')
+
+    def __repr__(self):
+        return f"<OrderItem {self.product_name} x{self.quantity}>"
+
+
+class CartItem(db.Model):
+    __tablename__ = 'cart_items'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    user_id = Column(Integer, db.ForeignKey('users.id'), nullable=False)
+    product_id = Column(Integer, db.ForeignKey('products.id'), nullable=False)
+    quantity = Column(Integer, nullable=False, default=1)
+    size = Column(Integer, nullable=False)
+    added_at = Column(DateTime, default=datetime.utcnow)
+    user = db.relationship('User', backref='cart_items')
+    product = db.relationship('Product', backref='cart_items')
+
+    def __repr__(self):
+        return f"<CartItem User:{self.user_id} Product:{self.product_id}>"

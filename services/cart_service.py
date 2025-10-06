@@ -1,29 +1,82 @@
-from services.catalog_service import get_product
+from services.models import db, CartItem, Product
 
-carts = {}
 
-def get_cart(user_email):
-    return carts.setdefault(user_email, [])
+def get_cart(user_id):
+    """Get all cart items for a user"""
+    cart_items = CartItem.query.filter_by(user_id=user_id).all()
 
-def add_to_cart(user_email, product_id, size=None, quantity=1):
-    product = get_product(product_id)
+    # Format to match old structure for templates
+    formatted_cart = []
+    for item in cart_items:
+        formatted_cart.append({
+            "product": item.product,
+            "size": item.size,
+            "quantity": item.quantity,
+            "cart_item_id": item.id
+        })
+
+    return formatted_cart
+
+
+def add_to_cart(user_id, product_id, size=None, quantity=1):
+    """Add product to cart"""
+    product = Product.query.get(product_id)
+
     if not product:
         return False, "Product not found"
+
     if product.stock < quantity:
         return False, "Not enough stock"
-    cart = get_cart(user_email)
-    for item in cart:
-        if item["product"].id == product_id and item.get("size") == size:
-            item["quantity"] += quantity
-            return True, "Added to cart"
-    cart.append({"product": product, "size": size, "quantity": quantity})
-    return True, "Added to cart"
+
+    if not size:
+        return False, "Size is required"
+
+    # Check if item already exists in cart
+    existing_item = CartItem.query.filter_by(
+        user_id=user_id,
+        product_id=product_id,
+        size=int(size)
+    ).first()
+
+    if existing_item:
+        # Update quantity
+        existing_item.quantity += quantity
+        db.session.commit()
+        return True, "Cart updated"
+    else:
+        # Create new cart item
+        cart_item = CartItem(
+            user_id=user_id,
+            product_id=product_id,
+            size=int(size),
+            quantity=quantity
+        )
+        db.session.add(cart_item)
+        db.session.commit()
+        return True, "Added to cart"
 
 
-def remove_from_cart(user_email, product_id):
-    cart = get_cart(user_email)
-    carts[user_email] = [item for item in cart if item["product"].id != product_id]
+def remove_from_cart(user_id, product_id):
+    """Remove product from cart"""
+    cart_items = CartItem.query.filter_by(
+        user_id=user_id,
+        product_id=product_id
+    ).all()
 
-def clear_cart(user_email):
-    carts[user_email] = []
+    for item in cart_items:
+        db.session.delete(item)
 
+    db.session.commit()
+    return True
+
+
+def clear_cart(user_id):
+    """Clear all items from user's cart"""
+    CartItem.query.filter_by(user_id=user_id).delete()
+    db.session.commit()
+    return True
+
+
+def get_cart_count(user_id):
+    """Get total number of items in cart"""
+    return CartItem.query.filter_by(user_id=user_id).count()

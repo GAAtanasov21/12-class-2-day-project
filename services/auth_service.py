@@ -1,25 +1,56 @@
-from services.models import User
+from services.models import db, User
 
-users = {}
 
 def create_user(email, password, is_admin=False):
-    if email.lower() in users:
+    """Create a new user"""
+    # Check if user already exists
+    existing_user = User.query.filter_by(email=email.lower()).first()
+    if existing_user:
         return None
-    user = User(email, password, is_admin)
-    users[email.lower()] = user
+
+    # Create new user
+    user = User(email=email, password=password, is_admin=is_admin)
+    db.session.add(user)
+    db.session.commit()
     return user
 
+
 def get_user(email):
-    return users.get(email.lower())
+    """Get user by email"""
+    return User.query.filter_by(email=email.lower()).first()
+
+
+def get_user_by_id(user_id):
+    """Get user by ID"""
+    return User.query.get(user_id)
+
 
 def verify_user(email, password):
+    """Verify user credentials"""
     user = get_user(email)
     return user and user.check_password(password)
 
-def init_sample_users():
-    if "admin@example.com" not in users:
-        create_user("admin@example.com", "admin123", True)
-    if "user1@example.com" not in users:
-        create_user("user1@example.com", "user123")
-    if "user2@example.com" not in users:
-        create_user("user2@example.com", "user123")
+
+def get_all_users():
+    """Get all users"""
+    return User.query.all()
+
+
+def delete_user(email):
+    """Delete user by email"""
+    user = get_user(email)
+    if user:
+        db.session.delete(user)
+        db.session.commit()
+        return True
+    return False
+
+
+def toggle_admin_status(email):
+    """Toggle admin status for a user"""
+    user = get_user(email)
+    if user:
+        user.is_admin = not user.is_admin
+        db.session.commit()
+        return True
+    return False

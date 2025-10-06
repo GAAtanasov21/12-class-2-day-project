@@ -4,13 +4,16 @@ from services.cart_service import get_cart, clear_cart
 
 order_bp = Blueprint("order", __name__, url_prefix="/order")
 
+
 @order_bp.route("/checkout", methods=["GET", "POST"])
 def checkout():
-    if not session.get("user_email"):
+    if not session.get("user_id"):
         flash("You must be logged in to place an order.")
         return redirect(url_for("auth.login"))
 
-    cart = get_cart(session.get("user_email"))
+    user_id = session.get("user_id")
+    cart = get_cart(user_id)
+
     if not cart:
         flash("Your cart is empty.")
         return redirect(url_for("catalog.catalog"))
@@ -24,10 +27,9 @@ def checkout():
             return redirect(url_for("order.checkout"))
 
         try:
-            order = create_order(session["user_email"], cart, address, payment)
-            clear_cart(session["user_email"])
+            order = create_order(user_id, cart, address, payment)
+            clear_cart(user_id)
             flash(f"Order #{order.id} placed successfully!")
-
             return redirect(url_for("index"))
         except ValueError as e:
             flash(str(e))

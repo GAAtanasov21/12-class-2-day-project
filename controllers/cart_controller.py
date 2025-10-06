@@ -3,18 +3,23 @@ from services.cart_service import add_to_cart, get_cart, remove_from_cart
 
 cart_bp = Blueprint("cart", __name__, url_prefix="/cart")
 
+
 def login_required():
-    return "user_email" in session
+    return "user_id" in session
+
 
 @cart_bp.route("/")
 def view_cart():
     if not login_required():
         flash("Login required")
         return redirect(url_for("auth.login"))
-    user_email = session["user_email"]
-    cart = get_cart(user_email)
+
+    user_id = session["user_id"]
+    cart = get_cart(user_id)
     total = sum(item["product"].price * item["quantity"] for item in cart)
+
     return render_template("cart.html", cart=cart, total=total)
+
 
 @cart_bp.route("/add/<int:product_id>")
 def add(product_id):
@@ -22,13 +27,14 @@ def add(product_id):
         flash("Login required")
         return redirect(url_for("auth.login"))
 
-    user_email = session["user_email"]
+    user_id = session["user_id"]
     size = request.args.get("size")
+
     if not size:
         flash("You must select a size")
         return redirect(url_for("catalog.catalog"))
 
-    success, msg = add_to_cart(user_email, product_id, size)
+    success, msg = add_to_cart(user_id, product_id, size)
     flash(msg)
     return redirect(url_for("catalog.catalog"))
 
@@ -38,10 +44,12 @@ def remove(product_id):
     if not login_required():
         flash("Login required")
         return redirect(url_for("auth.login"))
-    user_email = session["user_email"]
-    remove_from_cart(user_email, product_id)
+
+    user_id = session["user_id"]
+    remove_from_cart(user_id, product_id)
     flash("Item removed from cart")
     return redirect(url_for("cart.view_cart"))
+
 
 @cart_bp.route("/out_of_stock")
 def out_of_stock():

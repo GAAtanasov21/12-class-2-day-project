@@ -3,8 +3,10 @@ from services.catalog_service import list_products
 
 catalog_bp = Blueprint("catalog", __name__, url_prefix="/catalog")
 
+
 @catalog_bp.route("/")
 def catalog():
+    # Get all query parameters
     query = (request.args.get("q") or "").strip()
     color_filter = (request.args.get("color") or "").strip()
     min_price = request.args.get("min_price")
@@ -12,12 +14,14 @@ def catalog():
     size = request.args.get("size")
     in_stock = request.args.get("in_stock") == "on"
     category = request.args.get("category")
-    sort_by = request.args.get("sort_by")
+    sort_by = request.args.get("sort_by")  # Sorting parameter
 
+    # Convert to appropriate types
     min_price = float(min_price) if min_price else None
     max_price = float(max_price) if max_price else None
     size = int(size) if size and size.isdigit() else None
 
+    # Get filtered and sorted products from database
     products = list_products(
         query=query,
         color=color_filter,
@@ -51,6 +55,7 @@ def catalog():
         category_display=category_display,
         sort_by=sort_by or "",
     )
+
 
 @catalog_bp.route("/categories")
 def categories():

@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, session, redirect, url_for, flash, request
-from services.catalog_service import list_products, add_product, get_product, get_product_category
-from services.auth_service import users, get_user
+from services.catalog_service import list_products, add_product, get_product, get_product_category, delete_product, \
+    update_product
+from services.auth_service import get_all_users, get_user, delete_user, toggle_admin_status
 from services.order_service import list_orders
 
 admin_bp = Blueprint("admin", __name__, url_prefix="/admin")
@@ -8,7 +9,7 @@ admin_bp = Blueprint("admin", __name__, url_prefix="/admin")
 
 @admin_bp.before_request
 def check_admin():
-    if not session.get("user_email"):
+    if not session.get("user_id"):
         flash("Login required")
         return redirect(url_for("auth.login"))
     if not session.get("is_admin"):
@@ -23,10 +24,13 @@ def dashboard():
 
 @admin_bp.route("/products")
 def manage_product():
+    # Get sorting parameter
     sort_by = request.args.get("sort_by")
 
+    # Get products with sorting applied
     products = list_products(sort_by=sort_by)
 
+    # Add category info to each product for display
     products_with_category = []
     for p in products:
         category = get_product_category(p)
@@ -64,24 +68,27 @@ def edit_product(product_id):
     current_category = get_product_category(product)
 
     if request.method == "POST":
-        product.name = request.form.get("name", "").strip()
-        product.description = request.form.get("description", "").strip()
-        product.color = request.form.get("color", "").strip()
-        product.sizes = [int(s) for s in request.form.get("sizes", "").split(",") if s.strip().isdigit()]
-        product.price = float(request.form.get("price", product.price))
-        product.stock = int(request.form.get("stock", product.stock))
-        flash(f"Product {product.name} updated")
+        name = request.form.get("name", "").strip()
+        description = request.form.get("description", "").strip()
+        color = request.form.get("color", "").strip()
+        sizes = [int(s) for s in request.form.get("sizes", "").split(",") if s.strip().isdigit()]
+        price = float(request.form.get("price", product.price))
+        stock = int(request.form.get("stock", product.stock))
+
+        update_product(product_id, name, description, color, sizes, price, stock)
+        flash(f"Product {name} updated")
         return redirect(url_for("admin.manage_product"))
+
     return render_template("admin_product_form.html", action="Edit", product=product, category=current_category)
 
 
 @admin_bp.route("/products/delete/<int:product_id>", methods=["POST"])
-def delete_product(product_id):
+def delete_product_route(product_id):
     product = get_product(product_id)
     if product:
-        from services.catalog_service import products
-        products.remove(product)
-        flash(f"Product '{product.name}' deleted.")
+        product_name = product.name
+        delete_product(product_id)
+        flash(f"Product '{product_name}' deleted.")
     else:
         flash("Product not found.")
     return redirect(url_for("admin.manage_product"))
@@ -89,7 +96,7 @@ def delete_product(product_id):
 
 @admin_bp.route("/users")
 def manage_users():
-    all_users = list(users.values())
+    all_users = get_all_users()
     return render_template("admin_users.html", users=all_users)
 
 
@@ -101,21 +108,22 @@ def toggle_admin(email):
     elif user.email == session.get("user_email"):
         flash("You cannot change your own admin status.")
     else:
-        user.is_admin = not user.is_admin
+        toggle_admin_status(email)
+        user = get_user(email)  # Refresh user data
         flash(f"{'Promoted' if user.is_admin else 'Demoted'} {user.email}.")
     return redirect(url_for("admin.manage_users"))
 
 
 @admin_bp.route("/users/delete/<email>", methods=["POST"])
-def delete_user(email):
+def delete_user_route(email):
     user = get_user(email)
     if not user:
         flash("User not found.")
     elif user.email == session.get("user_email"):
         flash("You cannot delete yourself.")
     else:
-        users.pop(user.email, None)
-        flash(f"User {user.email} deleted.")
+        delete_user(email)
+        flash(f"User {email} deleted.")
     return redirect(url_for("admin.manage_users"))
 
 
