@@ -47,11 +47,34 @@
 <div class="product-grid">
   {% for p in products %}
     <div class="product-card">
+      <!-- Clickable product name -->
+      <h3><a href="{{ url_for('catalog.product_detail', product_id=p.id) }}" style="text-decoration: none; color: #2c3e50;">{{ p.name }}</a></h3>
+
+      <!-- Rating Display -->
+      <div style="margin: 0.5rem 0; color: #f39c12;">
+        {% set rating = p.get_average_rating() %}
+        {% if rating > 0 %}
+          {% for i in range(1, 6) %}
+            {% if i <= rating %}
+              ⭐
+            {% else %}
+              ☆
+            {% endif %}
+          {% endfor %}
+          <span style="color: #6a737d; font-size: 0.9rem;">({{ p.get_rating_count() }})</span>
+        {% else %}
+          <span style="color: #6a737d; font-size: 0.9rem;">No reviews yet</span>
+        {% endif %}
+      </div>
+
       <p>{{ p.description }}</p>
       <p><strong>Color:</strong> {{ p.color }}</p>
       <p><strong>Sizes:</strong> {{ p.sizes|join(', ') }}</p>
       <p><strong>Price:</strong> ${{ '%.2f'|format(p.price) }}</p>
       <p><strong>In stock:</strong> {{ p.stock }}</p>
+
+      <!-- View Details Button -->
+      <a href="{{ url_for('catalog.product_detail', product_id=p.id) }}" class="button ghost" style="display: block; text-align: center; margin-bottom: 0.5rem;">View Details</a>
 
       {% if session.get('user_email') %}
           {% if p.stock > 0 %}
@@ -64,9 +87,6 @@
               </select>
               <button type="submit">Add to Cart</button>
             </form>
-              <form action="{{ url_for('comments.comments') }}">
-                  <button type="submit">Go to comments</button>
-                </form>
           {% else %}
             <span style="color:red;">Out of stock</span>
           {% endif %}

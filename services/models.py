@@ -41,6 +41,9 @@ class Product(db.Model):
     product_type = Column(String(50))
     created_at = Column(DateTime, default=datetime.utcnow)
 
+    # Relationships
+    reviews = db.relationship('ProductReview', backref='product', lazy=True, cascade='all, delete-orphan')
+
     __mapper_args__ = {
         'polymorphic_identity': 'product',
         'polymorphic_on': product_type
@@ -63,6 +66,17 @@ class Product(db.Model):
 
     def calculate_discount(self, discount_percent):
         return self.price * (1 - discount_percent / 100)
+
+    def get_average_rating(self):
+        """Calculate average rating from reviews"""
+        if not self.reviews:
+            return 0
+        total = sum(review.rating for review in self.reviews)
+        return round(total / len(self.reviews), 1)
+
+    def get_rating_count(self):
+        """Get total number of ratings"""
+        return len(self.reviews)
 
     def __str__(self):
         return f"{self.name} - ${self.price}"
@@ -178,6 +192,25 @@ class CartItem(db.Model):
     def __repr__(self):
         return f"<CartItem User:{self.user_id} Product:{self.product_id}>"
 
+
+class ProductReview(db.Model):
+    """Product reviews with rating and comment"""
+    __tablename__ = 'product_reviews'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    product_id = Column(Integer, db.ForeignKey('products.id'), nullable=False)
+    user_id = Column(Integer, db.ForeignKey('users.id'), nullable=False)
+    rating = Column(Integer, nullable=False)  # 1-5 stars
+    comment = Column(Text, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    # Relationships
+    user = db.relationship('User', backref='reviews')
+
+    def __repr__(self):
+        return f"<ProductReview Product:{self.product_id} by User:{self.user_id} Rating:{self.rating}>"
+
+
 class Comments(db.Model):
     __tablename__ = 'comments'
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -187,4 +220,4 @@ class Comments(db.Model):
     user = db.relationship('User', backref='comments')
 
     def __repr__(self):
-        return f"<Comments User:{self.user_id} Product:{self.product_id}>"
+        return f"<Comments User:{self.user_id}>"

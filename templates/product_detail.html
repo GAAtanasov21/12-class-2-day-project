@@ -1,0 +1,231 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="margin-bottom: 1rem;">
+  <a href="{{ url_for('catalog.catalog') }}" class="button ghost">← Back to Catalog</a>
+</div>
+
+<!-- Product Details -->
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 3rem;">
+  <!-- Product Image Placeholder -->
+  <div style="background: #f6f8fa; border: 1px solid #e1e4e8; border-radius: 6px; padding: 3rem; text-align: center; min-height: 400px; display: flex; align-items: center; justify-content: center;">
+    <div>
+      <div style="font-size: 6rem; margin-bottom: 1rem;">
+        {% if category == 'running' %}
+          🏃
+        {% elif category == 'everyday' %}
+          👟
+        {% elif category == 'official' %}
+          👞
+        {% elif category == 'mountain' %}
+          🥾
+        {% else %}
+          👞
+        {% endif %}
+      </div>
+      <p style="color: #6a737d;">{{ product.name }}</p>
+    </div>
+  </div>
+
+  <!-- Product Info -->
+  <div>
+    <h1 style="margin-bottom: 0.5rem;">{{ product.name }}</h1>
+    
+    <!-- Rating -->
+    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+      <div style="font-size: 1.2rem;">
+        {% set rating = average_rating %}
+        {% for i in range(1, 6) %}
+          {% if i <= rating %}
+            ⭐
+          {% else %}
+            ☆
+          {% endif %}
+        {% endfor %}
+      </div>
+      <span style="color: #6a737d;">{{ average_rating }} / 5.0 ({{ rating_count }} reviews)</span>
+    </div>
+
+    <!-- Price -->
+    <div style="font-size: 2rem; font-weight: bold; color: #2c3e50; margin-bottom: 1.5rem;">
+      ${{ '%.2f'|format(product.price) }}
+    </div>
+
+    <!-- Description -->
+    <div style="margin-bottom: 1.5rem;">
+      <h3>Description</h3>
+      <p>{{ product.description }}</p>
+    </div>
+
+    <!-- Specifications -->
+    <div style="background: #f6f8fa; padding: 1.5rem; border-radius: 6px; margin-bottom: 1.5rem;">
+      <h3>Specifications</h3>
+      <table style="width: 100%; border: none;">
+        <tr>
+          <td style="border: none; padding: 0.5rem 0;"><strong>Category:</strong></td>
+          <td style="border: none; padding: 0.5rem 0;">
+            {% if category == 'running' %}
+              Running Shoes
+            {% elif category == 'everyday' %}
+              Everyday Shoes
+            {% elif category == 'official' %}
+              Official Shoes
+            {% elif category == 'mountain' %}
+              Mountain Shoes
+            {% endif %}
+          </td>
+        </tr>
+        <tr>
+          <td style="border: none; padding: 0.5rem 0;"><strong>Color:</strong></td>
+          <td style="border: none; padding: 0.5rem 0;">{{ product.color }}</td>
+        </tr>
+        <tr>
+          <td style="border: none; padding: 0.5rem 0;"><strong>Available Sizes:</strong></td>
+          <td style="border: none; padding: 0.5rem 0;">{{ product.sizes|join(', ') }}</td>
+        </tr>
+        <tr>
+          <td style="border: none; padding: 0.5rem 0;"><strong>Stock:</strong></td>
+          <td style="border: none; padding: 0.5rem 0;">
+            {% if product.stock > 0 %}
+              <span style="color: #28a745;">{{ product.stock }} available</span>
+            {% else %}
+              <span style="color: #dc3545;">Out of stock</span>
+            {% endif %}
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- Add to Cart -->
+    {% if session.get('user_email') %}
+      {% if product.stock > 0 %}
+        <form action="{{ url_for('cart.add', product_id=product.id) }}" method="get" style="display: flex; gap: 1rem; align-items: end;">
+          <div style="flex: 1;">
+            <label for="size">Select Size:</label>
+            <select name="size" id="size" required style="width: 100%; padding: 0.625rem; border: 1px solid #d1d5da; border-radius: 4px;">
+              {% for s in product.sizes %}
+                <option value="{{ s }}">{{ s }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <button type="submit" style="flex: 1;">Add to Cart</button>
+        </form>
+      {% else %}
+        <div style="padding: 1rem; background: #f8d7da; border: 1px solid #f5c6cb; border-radius: 4px; color: #721c24;">
+          This product is currently out of stock
+        </div>
+      {% endif %}
+    {% else %}
+      <a class="button" href="{{ url_for('auth.login') }}" style="width: 100%; text-align: center;">Login to Buy</a>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Reviews Section -->
+<div style="margin-top: 3rem;">
+  <h2>Customer Reviews</h2>
+  
+  <!-- Add Review Form -->
+  {% if session.get('user_email') %}
+    {% if not user_has_reviewed %}
+      <div style="background: #f6f8fa; padding: 2rem; border-radius: 6px; margin-bottom: 2rem; border: 1px solid #e1e4e8;">
+        <h3>Write a Review</h3>
+        <form method="post">
+          <div style="margin-bottom: 1rem;">
+            <label for="rating">Rating:</label>
+            <div style="display: flex; gap: 0.5rem; font-size: 2rem;">
+              <input type="radio" name="rating" value="1" id="star1" required style="display: none;">
+              <input type="radio" name="rating" value="2" id="star2" style="display: none;">
+              <input type="radio" name="rating" value="3" id="star3" style="display: none;">
+              <input type="radio" name="rating" value="4" id="star4" style="display: none;">
+              <input type="radio" name="rating" value="5" id="star5" style="display: none;">
+              
+              <label for="star1" class="star-label" data-rating="1">☆</label>
+              <label for="star2" class="star-label" data-rating="2">☆</label>
+              <label for="star3" class="star-label" data-rating="3">☆</label>
+              <label for="star4" class="star-label" data-rating="4">☆</label>
+              <label for="star5" class="star-label" data-rating="5">☆</label>
+            </div>
+          </div>
+
+          <div style="margin-bottom: 1rem;">
+            <label for="comment">Your Review:</label>
+            <textarea id="comment" name="comment" required style="width: 100%; min-height: 100px; padding: 0.625rem; border: 1px solid #d1d5da; border-radius: 4px; font-family: inherit;"></textarea>
+          </div>
+
+          <button type="submit">Submit Review</button>
+        </form>
+      </div>
+    {% else %}
+      <div style="padding: 1rem; background: #d1ecf1; border: 1px solid #bee5eb; border-radius: 4px; color: #0c5460; margin-bottom: 2rem;">
+        You have already reviewed this product
+      </div>
+    {% endif %}
+  {% else %}
+    <div style="padding: 1rem; background: #f8f9fa; border: 1px solid #e1e4e8; border-radius: 4px; margin-bottom: 2rem;">
+      <a href="{{ url_for('auth.login') }}">Login</a> to write a review
+    </div>
+  {% endif %}
+
+  <!-- Reviews List -->
+  {% if reviews %}
+    <div style="display: grid; gap: 1.5rem;">
+      {% for review in reviews %}
+        <div style="background: white; padding: 1.5rem; border: 1px solid #e1e4e8; border-radius: 6px;">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+            <div>
+              <strong>{{ review.user.email }}</strong>
+              <div style="color: #f39c12; margin-top: 0.25rem;">
+                {% for i in range(1, 6) %}
+                  {% if i <= review.rating %}
+                    ⭐
+                  {% else %}
+                    ☆
+                  {% endif %}
+                {% endfor %}
+              </div>
+            </div>
+            <span style="color: #6a737d; font-size: 0.9rem;">{{ review.created_at.strftime('%B %d, %Y') }}</span>
+          </div>
+          <p style="color: #2c3e50; line-height: 1.6;">{{ review.comment }}</p>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p style="color: #6a737d; text-align: center; padding: 2rem;">No reviews yet. Be the first to review this product!</p>
+  {% endif %}
+</div>
+
+<style>
+.star-label {
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.star-label:hover,
+.star-label:hover ~ .star-label {
+  color: #f39c12;
+}
+
+input[type="radio"]:checked ~ label.star-label {
+  color: #f39c12;
+}
+</style>
+
+<script>
+// Star rating interaction
+document.querySelectorAll('.star-label').forEach(label => {
+  label.addEventListener('click', function() {
+    const rating = this.getAttribute('data-rating');
+    document.querySelectorAll('.star-label').forEach(l => {
+      if (parseInt(l.getAttribute('data-rating')) <= rating) {
+        l.textContent = '⭐';
+      } else {
+        l.textContent = '☆';
+      }
+    });
+  });
+});
+</script>
+
+{% endblock %}

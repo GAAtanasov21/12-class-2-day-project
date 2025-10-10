@@ -1,5 +1,6 @@
-from flask import Blueprint, render_template, request
-from services.catalog_service import list_products
+from flask import Blueprint, render_template, request, session, flash, redirect, url_for
+from services.catalog_service import list_products, get_product, get_product_category
+from services.review_service import create_review, get_product_reviews, user_has_reviewed
 
 catalog_bp = Blueprint("catalog", __name__, url_prefix="/catalog")
 
@@ -14,7 +15,7 @@ def catalog():
     size = request.args.get("size")
     in_stock = request.args.get("in_stock") == "on"
     category = request.args.get("category")
-    sort_by = request.args.get("sort_by")  # Sorting parameter
+    sort_by = request.args.get("sort_by")
 
     # Convert to appropriate types
     min_price = float(min_price) if min_price else None
@@ -61,3 +62,61 @@ def catalog():
 def categories():
     return render_template("categories.html")
 
+
+@catalog_bp.route("/product/<int:product_id>", methods=["GET", "POST"])
+def product_detail(product_id):
+    """Product detail page with reviews and ratings"""
+    product = get_product(product_id)
+
+    if not product:
+        flash("Product not found")
+        return redirect(url_for("catalog.catalog"))
+
+    # Handle review submission
+    if request.method == "POST":
+        if not session.get("user_id"):
+            flash("You must be logged in to leave a review")
+            return redirect(url_for("auth.login"))
+
+        user_id = session.get("user_id")
+        rating = request.form.get("rating")
+        comment = request.form.get("comment", "").strip()
+
+        if not rating:
+            flash("Please select a rating")
+            return redirect(url_for("catalog.product_detail", product_id=product_id))
+
+        if not comment:
+            flash("Please write a comment")
+            return redirect(url_for("catalog.product_detail", product_id=product_id))
+
+        # Check if user already reviewed
+        if user_has_reviewed(user_id, product_id):
+            flash("You have already reviewed this product")
+            return redirect(url_for("catalog.product_detail", product_id=product_id))
+
+        # Create review
+        create_review(user_id, product_id, int(rating), comment)
+        flash("Thank you for your review!")
+        return redirect(url_for("catalog.product_detail", product_id=product_id))
+
+    # Get product details
+    category = get_product_category(product)
+    reviews = get_product_reviews(product_id)
+    average_rating = product.get_average_rating()
+    rating_count = product.get_rating_count()
+
+    # Check if current user has reviewed
+    user_has_reviewed_product = False
+    if session.get("user_id"):
+        user_has_reviewed_product = user_has_reviewed(session.get("user_id"), product_id)
+
+    return render_template(
+        "product_detail.html",
+        product=product,
+        category=category,
+        reviews=reviews,
+        average_rating=average_rating,
+        rating_count=rating_count,
+        user_has_reviewed=user_has_reviewed_product
+    )
