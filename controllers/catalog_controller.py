@@ -60,3 +60,4 @@ def catalog():
 @catalog_bp.route("/categories")
 def categories():
     return render_template("categories.html")
+

@@ -1,4 +1,4 @@
-from services.models import db, Product, RunningShoe, EverydayShoe, OfficialShoe, MountainShoe
+from services.models import db, Comments, Product, RunningShoe, EverydayShoe, OfficialShoe, MountainShoe
 
 
 def add_product(name, description, color, sizes, price, stock, category=None):

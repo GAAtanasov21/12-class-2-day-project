@@ -47,7 +47,6 @@
 <div class="product-grid">
   {% for p in products %}
     <div class="product-card">
-      <h3>{{ p.name }}</h3>
       <p>{{ p.description }}</p>
       <p><strong>Color:</strong> {{ p.color }}</p>
       <p><strong>Sizes:</strong> {{ p.sizes|join(', ') }}</p>
@@ -65,6 +64,9 @@
               </select>
               <button type="submit">Add to Cart</button>
             </form>
+              <form action="{{ url_for('comments.comments') }}">
+                  <button type="submit">Go to comments</button>
+                </form>
           {% else %}
             <span style="color:red;">Out of stock</span>
           {% endif %}

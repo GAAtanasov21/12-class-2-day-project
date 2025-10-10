@@ -177,3 +177,14 @@ class CartItem(db.Model):
 
     def __repr__(self):
         return f"<CartItem User:{self.user_id} Product:{self.product_id}>"
+
+class Comments(db.Model):
+    __tablename__ = 'comments'
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    user_id = Column(Integer, db.ForeignKey('users.id'), nullable=False)
+    comment = Column(Text, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    user = db.relationship('User', backref='comments')
+
+    def __repr__(self):
+        return f"<Comments User:{self.user_id} Product:{self.product_id}>"

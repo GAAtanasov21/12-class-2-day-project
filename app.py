@@ -2,6 +2,7 @@ from flask import Flask, render_template
 from controllers.auth_controller import auth_bp
 from controllers.catalog_controller import catalog_bp
 from controllers.cart_controller import cart_bp
+from controllers.comments_controller import comments_bp
 from controllers.order_controller import order_bp
 from controllers.admin_controller import admin_bp
 from services.models import db
@@ -23,6 +24,7 @@ app.register_blueprint(catalog_bp)
 app.register_blueprint(cart_bp)
 app.register_blueprint(order_bp)
 app.register_blueprint(admin_bp)
+app.register_blueprint(comments_bp)
 
 @app.route('/')
 def index():
@@ -32,6 +34,7 @@ def index():
 with app.app_context():
     db.create_all()
     init_sample_data()
+    """db.drop_all()"""
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
