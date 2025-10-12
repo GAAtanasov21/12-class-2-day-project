@@ -1,3 +1,4 @@
+import os
 from flask import Flask, render_template
 from controllers.auth_controller import auth_bp
 from controllers.catalog_controller import catalog_bp
@@ -5,6 +6,7 @@ from controllers.cart_controller import cart_bp
 from controllers.comments_controller import comments_bp
 from controllers.order_controller import order_bp
 from controllers.admin_controller import admin_bp
+from controllers.profile_controller import profile_bp
 from services.models import db
 from services.init_data import init_sample_data
 
@@ -14,6 +16,10 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'supersecret-change-in-production'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///shoestore.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024  # 5MB max file size
+
+# Create upload directories
+os.makedirs('static/uploads/profiles', exist_ok=True)
 
 # Initialize SQLAlchemy
 db.init_app(app)
@@ -25,6 +31,7 @@ app.register_blueprint(cart_bp)
 app.register_blueprint(order_bp)
 app.register_blueprint(admin_bp)
 app.register_blueprint(comments_bp)
+app.register_blueprint(profile_bp)
 
 @app.route('/')
 def index():

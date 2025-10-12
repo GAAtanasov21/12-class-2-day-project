@@ -3,6 +3,7 @@ from services.catalog_service import list_products, add_product, get_product, ge
     update_product
 from services.auth_service import get_all_users, get_user, delete_user, toggle_admin_status
 from services.order_service import list_orders
+from services.profile_service import get_pending_profile_pictures, approve_profile_picture, reject_profile_picture
 
 admin_bp = Blueprint("admin", __name__, url_prefix="/admin")
 
@@ -19,18 +20,16 @@ def check_admin():
 
 @admin_bp.route("/")
 def dashboard():
-    return render_template("admin_dashboard.html")
+    # Get pending profile pictures count
+    pending_pictures = get_pending_profile_pictures()
+    return render_template("admin_dashboard.html", pending_count=len(pending_pictures))
 
 
 @admin_bp.route("/products")
 def manage_product():
-    # Get sorting parameter
     sort_by = request.args.get("sort_by")
-
-    # Get products with sorting applied
     products = list_products(sort_by=sort_by)
 
-    # Add category info to each product for display
     products_with_category = []
     for p in products:
         category = get_product_category(p)
@@ -109,7 +108,7 @@ def toggle_admin(email):
         flash("You cannot change your own admin status.")
     else:
         toggle_admin_status(email)
-        user = get_user(email)  # Refresh user data
+        user = get_user(email)
         flash(f"{'Promoted' if user.is_admin else 'Demoted'} {user.email}.")
     return redirect(url_for("admin.manage_users"))
 
@@ -131,3 +130,26 @@ def delete_user_route(email):
 def view_orders():
     all_orders = list_orders()
     return render_template("admin_orders.html", orders=all_orders)
+
+
+@admin_bp.route("/profile-pictures")
+def manage_profile_pictures():
+    """View all pending profile pictures for approval"""
+    pending_users = get_pending_profile_pictures()
+    return render_template("admin_profile_pictures.html", pending_users=pending_users)
+
+
+@admin_bp.route("/profile-pictures/approve/<int:user_id>", methods=["POST"])
+def approve_picture(user_id):
+    """Approve a profile picture"""
+    success, message = approve_profile_picture(user_id)
+    flash(message)
+    return redirect(url_for("admin.manage_profile_pictures"))
+
+
+@admin_bp.route("/profile-pictures/reject/<int:user_id>", methods=["POST"])
+def reject_picture(user_id):
+    """Reject a profile picture"""
+    success, message = reject_profile_picture(user_id)
+    flash(message)
+    return redirect(url_for("admin.manage_profile_pictures"))

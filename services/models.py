@@ -13,6 +13,8 @@ class User(db.Model):
     email = Column(String(120), unique=True, nullable=False, index=True)
     password_hash = Column(String(255), nullable=False)
     is_admin = Column(Boolean, default=False, nullable=False)
+    profile_picture = Column(String(255), nullable=True)  # Path to image
+    profile_picture_status = Column(String(20), default='none')  # none, pending, approved, rejected
     created_at = Column(DateTime, default=datetime.utcnow)
     orders = db.relationship('Order', backref='user', lazy=True)
 
@@ -20,9 +22,24 @@ class User(db.Model):
         self.email = email.lower().strip()
         self.password_hash = generate_password_hash(password)
         self.is_admin = is_admin
+        self.profile_picture_status = 'none'
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
+
+    def set_password(self, new_password):
+        """Update user password"""
+        self.password_hash = generate_password_hash(new_password)
+
+    def has_profile_picture(self):
+        """Check if user has an approved profile picture"""
+        return self.profile_picture_status == 'approved' and self.profile_picture is not None
+
+    def get_profile_picture_url(self):
+        """Get profile picture URL or default"""
+        if self.has_profile_picture():
+            return f'/static/uploads/profiles/{self.profile_picture}'
+        return '/static/uploads/profiles/default.png'
 
     def __repr__(self):
         return f"<User {self.email}>"
@@ -41,7 +58,6 @@ class Product(db.Model):
     product_type = Column(String(50))
     created_at = Column(DateTime, default=datetime.utcnow)
 
-    # Relationships
     reviews = db.relationship('ProductReview', backref='product', lazy=True, cascade='all, delete-orphan')
 
     __mapper_args__ = {
@@ -68,14 +84,12 @@ class Product(db.Model):
         return self.price * (1 - discount_percent / 100)
 
     def get_average_rating(self):
-        """Calculate average rating from reviews"""
         if not self.reviews:
             return 0
         total = sum(review.rating for review in self.reviews)
         return round(total / len(self.reviews), 1)
 
     def get_rating_count(self):
-        """Get total number of ratings"""
         return len(self.reviews)
 
     def __str__(self):
@@ -194,17 +208,15 @@ class CartItem(db.Model):
 
 
 class ProductReview(db.Model):
-    """Product reviews with rating and comment"""
     __tablename__ = 'product_reviews'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     product_id = Column(Integer, db.ForeignKey('products.id'), nullable=False)
     user_id = Column(Integer, db.ForeignKey('users.id'), nullable=False)
-    rating = Column(Integer, nullable=False)  # 1-5 stars
+    rating = Column(Integer, nullable=False)
     comment = Column(Text, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
 
-    # Relationships
     user = db.relationship('User', backref='reviews')
 
     def __repr__(self):

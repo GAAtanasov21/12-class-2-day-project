@@ -3,12 +3,10 @@ from services.models import db, User
 
 def create_user(email, password, is_admin=False):
     """Create a new user"""
-    # Check if user already exists
     existing_user = User.query.filter_by(email=email.lower()).first()
     if existing_user:
         return None
 
-    # Create new user
     user = User(email=email, password=password, is_admin=is_admin)
     db.session.add(user)
     db.session.commit()
@@ -54,3 +52,14 @@ def toggle_admin_status(email):
         db.session.commit()
         return True
     return False
+
+
+def change_password(user_id, new_password):
+    """Change user password"""
+    user = get_user_by_id(user_id)
+    if not user:
+        return False, "User not found"
+
+    user.set_password(new_password)
+    db.session.commit()
+    return True, "Password changed successfully"

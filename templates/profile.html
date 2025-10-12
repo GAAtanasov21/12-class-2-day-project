@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>My Profile</h2>
+
+<div style="display: grid; grid-template-columns: 300px 1fr; gap: 2rem; margin-top: 2rem;">
+  <!-- Profile Picture Section -->
+  <div style="text-align: center;">
+    <div style="width: 250px; height: 250px; border-radius: 50%; overflow: hidden; border: 3px solid #e1e4e8; margin: 0 auto 1rem;">
+      {% if user.has_profile_picture() %}
+        <img src="{{ user.get_profile_picture_url() }}" alt="Profile Picture" style="width: 100%; height: 100%; object-fit: cover;">
+      {% else %}
+        <div style="width: 100%; height: 100%; background: #f6f8fa; display: flex; align-items: center; justify-content: center; font-size: 5rem;">
+          👤
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Profile Picture Status -->
+    {% if user.profile_picture_status == 'pending' %}
+      <div style="padding: 0.75rem; background: #fff3cd; border: 1px solid #ffc107; border-radius: 4px; margin-bottom: 1rem;">
+        <strong>⏳ Pending Approval</strong><br>
+        <small>Your profile picture is waiting for admin approval</small>
+      </div>
+    {% elif user.profile_picture_status == 'rejected' %}
+      <div style="padding: 0.75rem; background: #f8d7da; border: 1px solid #f5c6cb; border-radius: 4px; margin-bottom: 1rem;">
+        <strong>❌ Rejected</strong><br>
+        <small>Your profile picture was rejected. Please upload a new one.</small>
+      </div>
+    {% elif user.profile_picture_status == 'approved' %}
+      <div style="padding: 0.75rem; background: #d4edda; border: 1px solid #c3e6cb; border-radius: 4px; margin-bottom: 1rem;">
+        <strong>✅ Approved</strong>
+      </div>
+    {% endif %}
+
+    <a href="{{ url_for('profile.edit_profile') }}" class="button" style="width: 100%; display: block; text-align: center;">Edit Profile</a>
+    
+    {% if user.profile_picture and user.profile_picture_status == 'approved' %}
+      <form method="post" action="{{ url_for('profile.delete_profile_picture') }}" style="margin-top: 0.5rem;">
+        <button type="submit" class="button ghost" style="width: 100%;" onclick="return confirm('Delete profile picture?');">Delete Picture</button>
+      </form>
+    {% endif %}
+  </div>
+
+  <!-- Profile Information -->
+  <div>
+    <div style="background: white; padding: 2rem; border: 1px solid #e1e4e8; border-radius: 6px;">
+      <h3>Account Information</h3>
+      
+      <table style="width: 100%; border: none;">
+        <tr>
+          <td style="border: none; padding: 0.75rem 0; font-weight: bold; width: 30%;">Email:</td>
+          <td style="border: none; padding: 0.75rem 0;">{{ user.email }}</td>
+        </tr>
+        <tr>
+          <td style="border: none; padding: 0.75rem 0; font-weight: bold;">Account Type:</td>
+          <td style="border: none; padding: 0.75rem 0;">
+            {% if user.is_admin %}
+              <span style="color: #dc3545; font-weight: bold;">Admin</span>
+            {% else %}
+              Regular User
+            {% endif %}
+          </td>
+        </tr>
+        <tr>
+          <td style="border: none; padding: 0.75rem 0; font-weight: bold;">Member Since:</td>
+          <td style="border: none; padding: 0.75rem 0;">{{ user.created_at.strftime('%B %d, %Y') }}</td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- Quick Stats -->
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 1.5rem;">
+      <div style="background: white; padding: 1.5rem; border: 1px solid #e1e4e8; border-radius: 6px; text-align: center;">
+        <div style="font-size: 2rem; font-weight: bold; color: #2c3e50;">{{ user.orders|length }}</div>
+        <div style="color: #6a737d; font-size: 0.9rem;">Total Orders</div>
+      </div>
+      
+      <div style="background: white; padding: 1.5rem; border: 1px solid #e1e4e8; border-radius: 6px; text-align: center;">
+        <div style="font-size: 2rem; font-weight: bold; color: #2c3e50;">{{ user.reviews|length }}</div>
+        <div style="color: #6a737d; font-size: 0.9rem;">Reviews Written</div>
+      </div>
+      
+      <div style="background: white; padding: 1.5rem; border: 1px solid #e1e4e8; border-radius: 6px; text-align: center;">
+        <div style="font-size: 2rem; font-weight: bold; color: #2c3e50;">{{ user.cart_items|length }}</div>
+        <div style="color: #6a737d; font-size: 0.9rem;">Items in Cart</div>
+      </div>
+    </div>
+
+    <!-- Recent Orders -->
+    {% if user.orders %}
+    <div style="background: white; padding: 2rem; border: 1px solid #e1e4e8; border-radius: 6px; margin-top: 1.5rem;">
+      <h3>Recent Orders</h3>
+      <table style="width: 100%; margin-top: 1rem;">
+        <thead>
+          <tr>
+            <th>Order #</th>
+            <th>Date</th>
+            <th>Items</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for order in user.orders|sort(attribute='created_at', reverse=True)|slice(5) %}
+          <tr>
+            <td>#{{ order.id }}</td>
+            <td>{{ order.created_at.strftime('%Y-%m-%d') }}</td>
+            <td>{{ order.items|length }}</td>
+            <td>${{ '%.2f'|format(order.total) }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+{% endblock %}
