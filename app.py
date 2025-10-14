@@ -7,6 +7,7 @@ from controllers.comments_controller import comments_bp
 from controllers.order_controller import order_bp
 from controllers.admin_controller import admin_bp
 from controllers.profile_controller import profile_bp
+from controllers.calendar_controller import calendar_bp
 from services.models import db
 from services.init_data import init_sample_data
 
@@ -32,6 +33,7 @@ app.register_blueprint(order_bp)
 app.register_blueprint(admin_bp)
 app.register_blueprint(comments_bp)
 app.register_blueprint(profile_bp)
+app.register_blueprint(calendar_bp)
 
 @app.route('/')
 def index():
@@ -41,7 +43,6 @@ def index():
 with app.app_context():
     db.create_all()
     init_sample_data()
-    """db.drop_all()"""
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)

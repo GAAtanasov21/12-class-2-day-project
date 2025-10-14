@@ -1,0 +1,172 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="margin-bottom: 1rem;">
+  <a href="{{ url_for('calendar.view_calendar') }}" class="button ghost">← Back to Calendar</a>
+</div>
+
+<h2>Order #{{ order.id }} Details</h2>
+
+<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 2rem; margin-top: 2rem;">
+  
+  <!-- Order Items -->
+  <div>
+    <div style="background: white; padding: 2rem; border: 1px solid #e1e4e8; border-radius: 6px;">
+      <h3>Order Items</h3>
+      
+      <table style="width: 100%; margin-top: 1rem;">
+        <thead>
+          <tr>
+            <th>Product</th>
+            <th>Size</th>
+            <th>Quantity</th>
+            <th>Price</th>
+            <th>Subtotal</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in order.items %}
+          <tr>
+            <td>
+              <strong>{{ item.product_name }}</strong>
+              {% if item.product %}
+                <br><small style="color: #6a737d;">{{ item.product.color }}</small>
+              {% endif %}
+            </td>
+            <td>{{ item.size }}</td>
+            <td>{{ item.quantity }}</td>
+            <td>${{ '%.2f'|format(item.price_at_purchase) }}</td>
+            <td>${{ '%.2f'|format(item.subtotal) }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+        <tfoot>
+          <tr style="border-top: 2px solid #e1e4e8;">
+            <td colspan="4" style="text-align: right; font-weight: bold; padding-top: 1rem;">Total:</td>
+            <td style="font-weight: bold; font-size: 1.2rem; padding-top: 1rem;">${{ '%.2f'|format(order.total) }}</td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+
+    <!-- Delivery Timeline -->
+    <div style="background: white; padding: 2rem; border: 1px solid #e1e4e8; border-radius: 6px; margin-top: 1.5rem;">
+      <h3>Delivery Timeline</h3>
+      
+      <div style="position: relative; padding-left: 2rem; margin-top: 1.5rem;">
+        <!-- Timeline line -->
+        <div style="position: absolute; left: 0.5rem; top: 0; bottom: 0; width: 2px; background: #e1e4e8;"></div>
+        
+        <!-- Order Placed -->
+        <div style="position: relative; margin-bottom: 2rem;">
+          <div style="position: absolute; left: -1.55rem; width: 1rem; height: 1rem; background: #28a745; border-radius: 50%; border: 3px solid white;"></div>
+          <div>
+            <strong style="color: #28a745;">✓ Order Placed</strong>
+            <div style="color: #6a737d; font-size: 0.9rem;">{{ order.created_at.strftime('%B %d, %Y at %H:%M') }}</div>
+          </div>
+        </div>
+        
+        <!-- Processing -->
+        <div style="position: relative; margin-bottom: 2rem;">
+          <div style="position: absolute; left: -1.55rem; width: 1rem; height: 1rem; background: #28a745; border-radius: 50%; border: 3px solid white;"></div>
+          <div>
+            <strong style="color: #28a745;">✓ Processing</strong>
+            <div style="color: #6a737d; font-size: 0.9rem;">{{ (order.created_at + timedelta(hours=2)).strftime('%B %d, %Y at %H:%M') }}</div>
+          </div>
+        </div>
+        
+        <!-- Shipped -->
+        <div style="position: relative; margin-bottom: 2rem;">
+          <div style="position: absolute; left: -1.55rem; width: 1rem; height: 1rem; background: #28a745; border-radius: 50%; border: 3px solid white;"></div>
+          <div>
+            <strong style="color: #28a745;">✓ Shipped</strong>
+            <div style="color: #6a737d; font-size: 0.9rem;">{{ (order.created_at + timedelta(days=1)).strftime('%B %d, %Y at %H:%M') }}</div>
+          </div>
+        </div>
+        
+        <!-- Delivered -->
+        <div style="position: relative;">
+          <div style="position: absolute; left: -1.55rem; width: 1rem; height: 1rem; background: #28a745; border-radius: 50%; border: 3px solid white;"></div>
+          <div>
+            <strong style="color: #28a745;">✓ Delivered</strong>
+            <div style="color: #6a737d; font-size: 0.9rem;">{{ (order.created_at + timedelta(days=3)).strftime('%B %d, %Y at %H:%M') }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Order Summary -->
+  <div>
+    <div style="background: white; padding: 2rem; border: 1px solid #e1e4e8; border-radius: 6px;">
+      <h3>Order Summary</h3>
+      
+      <div style="margin-top: 1.5rem;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem;">
+          <span style="color: #6a737d;">Order Number:</span>
+          <strong>#{{ order.id }}</strong>
+        </div>
+        
+        <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem;">
+          <span style="color: #6a737d;">Order Date:</span>
+          <strong>{{ order.created_at.strftime('%B %d, %Y') }}</strong>
+        </div>
+        
+        <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem;">
+          <span style="color: #6a737d;">Status:</span>
+          <span style="padding: 0.25rem 0.75rem; background: #28a745; color: white; border-radius: 12px; font-size: 0.85rem;">
+            Delivered
+          </span>
+        </div>
+        
+        <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem;">
+          <span style="color: #6a737d;">Total Items:</span>
+          <strong>{{ order.items|length }}</strong>
+        </div>
+        
+        <hr style="margin: 1rem 0; border: none; border-top: 1px solid #e1e4e8;">
+        
+        <div style="display: flex; justify-content: space-between; font-size: 1.2rem;">
+          <span style="font-weight: bold;">Total:</span>
+          <strong style="color: #2c3e50;">${{ '%.2f'|format(order.total) }}</strong>
+        </div>
+      </div>
+    </div>
+
+    <!-- Delivery Information -->
+    <div style="background: white; padding: 2rem; border: 1px solid #e1e4e8; border-radius: 6px; margin-top: 1.5rem;">
+      <h3>Delivery Information</h3>
+      
+      <div style="margin-top: 1rem;">
+        <div style="margin-bottom: 1rem;">
+          <strong style="display: block; margin-bottom: 0.25rem; color: #6a737d; font-size: 0.9rem;">Shipping Address:</strong>
+          <p style="margin: 0; white-space: pre-line;">{{ order.address }}</p>
+        </div>
+        
+        <div>
+          <strong style="display: block; margin-bottom: 0.25rem; color: #6a737d; font-size: 0.9rem;">Payment Method:</strong>
+          <p style="margin: 0; text-transform: capitalize;">{{ order.payment_method }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div style="background: white; padding: 2rem; border: 1px solid #e1e4e8; border-radius: 6px; margin-top: 1.5rem;">
+      <h3>Actions</h3>
+      
+      <div style="display: flex; flex-direction: column; gap: 0.75rem; margin-top: 1rem;">
+        <a href="{{ url_for('catalog.catalog') }}" class="button" style="text-align: center;">Order Again</a>
+        <button onclick="window.print()" class="button ghost">Print Order</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Import timedelta for template -->
+{% set timedelta = None %}
+{% if timedelta is none %}
+  {% set timedelta = __import__('datetime').timedelta %}
+{% endif %}
+
+{% endblock %}

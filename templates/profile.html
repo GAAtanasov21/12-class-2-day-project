@@ -33,8 +33,10 @@
       </div>
     {% endif %}
 
-    <a href="{{ url_for('profile.edit_profile') }}" class="button" style="width: 100%; display: block; text-align: center;">Edit Profile</a>
-    
+    <a href="{{ url_for('profile.edit_profile') }}" class="button" style="width: 100%; display: block; text-align: center; margin-bottom: 0.5rem;">Edit Profile</a>
+
+    <a href="{{ url_for('calendar.view_calendar') }}" class="button" style="width: 100%; display: block; text-align: center; background: #17a2b8; border-color: #17a2b8;">📅 View Calendar</a>
+
     {% if user.profile_picture and user.profile_picture_status == 'approved' %}
       <form method="post" action="{{ url_for('profile.delete_profile_picture') }}" style="margin-top: 0.5rem;">
         <button type="submit" class="button ghost" style="width: 100%;" onclick="return confirm('Delete profile picture?');">Delete Picture</button>
@@ -46,7 +48,7 @@
   <div>
     <div style="background: white; padding: 2rem; border: 1px solid #e1e4e8; border-radius: 6px;">
       <h3>Account Information</h3>
-      
+
       <table style="width: 100%; border: none;">
         <tr>
           <td style="border: none; padding: 0.75rem 0; font-weight: bold; width: 30%;">Email:</td>
@@ -75,12 +77,12 @@
         <div style="font-size: 2rem; font-weight: bold; color: #2c3e50;">{{ user.orders|length }}</div>
         <div style="color: #6a737d; font-size: 0.9rem;">Total Orders</div>
       </div>
-      
+
       <div style="background: white; padding: 1.5rem; border: 1px solid #e1e4e8; border-radius: 6px; text-align: center;">
         <div style="font-size: 2rem; font-weight: bold; color: #2c3e50;">{{ user.reviews|length }}</div>
         <div style="color: #6a737d; font-size: 0.9rem;">Reviews Written</div>
       </div>
-      
+
       <div style="background: white; padding: 1.5rem; border: 1px solid #e1e4e8; border-radius: 6px; text-align: center;">
         <div style="font-size: 2rem; font-weight: bold; color: #2c3e50;">{{ user.cart_items|length }}</div>
         <div style="color: #6a737d; font-size: 0.9rem;">Items in Cart</div>
@@ -90,8 +92,11 @@
     <!-- Recent Orders -->
     {% if user.orders %}
     <div style="background: white; padding: 2rem; border: 1px solid #e1e4e8; border-radius: 6px; margin-top: 1.5rem;">
-      <h3>Recent Orders</h3>
-      <table style="width: 100%; margin-top: 1rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <h3 style="margin: 0;">Recent Orders</h3>
+        <a href="{{ url_for('calendar.view_calendar') }}" style="color: #17a2b8; text-decoration: none; font-size: 0.9rem;">View All in Calendar →</a>
+      </div>
+      <table style="width: 100%;">
         <thead>
           <tr>
             <th>Order #</th>
