@@ -23,11 +23,12 @@ def view_profile():
         return redirect(url_for("auth.login"))
 
     user = get_user_by_id(session.get("user_id"))
+    recent_orders = sorted(user.orders, key=lambda o: o.created_at, reverse=True)[:5]
     if not user:
         flash("User not found")
         return redirect(url_for("index"))
 
-    return render_template("profile.html", user=user)
+    return render_template("profile.html", user=user, recent_orders= recent_orders)
 
 
 @profile_bp.route("/edit", methods=["GET", "POST"])

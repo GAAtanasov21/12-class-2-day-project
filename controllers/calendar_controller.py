@@ -14,6 +14,7 @@ def view_calendar():
         return redirect(url_for("auth.login"))
 
     user = get_user_by_id(session.get("user_id"))
+    recent_orders = sorted(user.orders, key=lambda o: o.created_at, reverse=True)[:5]
     if not user:
         flash("User not found")
         return redirect(url_for("index"))
@@ -35,7 +36,8 @@ def view_calendar():
                            orders=orders,
                            current_year=year,
                            current_month=month,
-                           today=now.date())
+                           today=now.date(),
+                           recent_orders = recent_orders)
 
 
 @calendar_bp.route("/api/orders")

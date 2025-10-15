@@ -43,6 +43,7 @@ def index():
 with app.app_context():
     db.create_all()
     init_sample_data()
+    """db.drop_all()"""
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
